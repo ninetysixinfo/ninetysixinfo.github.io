@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact Us · ninetysixinfo</title>
+  <title>App Support · ninetysixinfo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -377,14 +377,14 @@
         <div class="mark">96</div>
         <div class="logo-text">
           <strong>ninetysixinfo</strong>
-          <span>Contact desk</span>
+          <span>App support</span>
         </div>
       </div>
 
       <div class="hero">
-        <div class="kicker">Get in touch</div>
-        <h1>Let’s start<br />the conversation.</h1>
-        <p>Share your project, question, or idea. The ninetysixinfo team reads every message and replies from the inbox below.</p>
+        <div class="kicker">Help center</div>
+        <h1>App contact<br />support.</h1>
+        <p>Having trouble with the ninetysixinfo app? Tell us what happened. Your mail app will open so you can send the request to our support inbox.</p>
       </div>
 
       <dl class="meta">
@@ -393,8 +393,8 @@
           <dd><a href="mailto:nayangabani96@gmail.com">nayangabani96@gmail.com</a></dd>
         </div>
         <div>
-          <dt>Response</dt>
-          <dd>Usually within 24 hours</dd>
+          <dt>Support hours</dt>
+          <dd>Replies within 24 hours</dd>
         </div>
       </dl>
     </aside>
@@ -402,8 +402,8 @@
     <main class="panel">
       <div class="card">
         <div id="formWrap">
-          <h2>Contact us</h2>
-          <p>Fill in the form and we’ll send your note straight to our mailbox.</p>
+          <h2>Contact support</h2>
+          <p>Fill in the details, then open your mail app to send the message.</p>
 
           <form id="contactForm" novalidate>
             <input class="honeypot" type="text" name="_honey" tabindex="-1" autocomplete="off" />
@@ -425,32 +425,31 @@
                 <input type="tel" name="phone" placeholder="+91 00000 00000" />
               </label>
               <label>
-                Subject
+                Issue type
                 <select name="subject" required>
-                  <option value="" disabled selected>Choose a topic</option>
-                  <option>General inquiry</option>
-                  <option>Project request</option>
-                  <option>Support</option>
-                  <option>Partnership</option>
+                  <option value="" disabled selected>Choose an issue</option>
+                  <option>Bug or crash</option>
+                  <option>Login or account</option>
+                  <option>Payment or billing</option>
+                  <option>Feature request</option>
+                  <option>Other</option>
                 </select>
               </label>
             </div>
 
             <label>
               Message
-              <textarea name="message" placeholder="How can we help?" required></textarea>
+              <textarea name="message" placeholder="Describe the issue. Include device and app version if you can." required></textarea>
             </label>
 
-            <div id="status" class="status" role="status"></div>
-
-            <button type="submit" id="submitBtn">Send message →</button>
+            <button type="submit">Open mail to send →</button>
           </form>
         </div>
 
         <div id="done" class="done">
           <div class="check">✓</div>
-          <h3>Message sent</h3>
-          <p>Thanks for reaching out. We’ll get back to you at the email you provided.</p>
+          <h3>Mail app opened</h3>
+          <p>Send the message from your mail app. We’ll reply to the email you included.</p>
         </div>
       </div>
     </main>
@@ -458,18 +457,11 @@
 
   <script>
     const form = document.getElementById("contactForm");
-    const statusEl = document.getElementById("status");
-    const submitBtn = document.getElementById("submitBtn");
     const formWrap = document.getElementById("formWrap");
     const done = document.getElementById("done");
     const inbox = "nayangabani96@gmail.com";
 
-    function showStatus(type, text) {
-      statusEl.className = "status show " + type;
-      statusEl.textContent = text;
-    }
-
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
 
       if (!form.reportValidity()) return;
@@ -477,42 +469,25 @@
       const data = Object.fromEntries(new FormData(form).entries());
       if (data._honey) return;
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Sending…";
-      statusEl.className = "status";
+      const subject = "ninetysixinfo app support: " + data.subject;
+      const body = [
+        "Name: " + data.name,
+        "Email: " + data.email,
+        "Phone: " + (data.phone || "—"),
+        "Issue: " + data.subject,
+        "",
+        data.message
+      ].join("\n");
 
-      try {
-        const response = await fetch("https://formsubmit.co/ajax/" + inbox, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json"
-          },
-          body: JSON.stringify({
-            name: data.name,
-            email: data.email,
-            phone: data.phone || "—",
-            subject: data.subject,
-            message: data.message,
-            _subject: "New contact from ninetysixinfo: " + data.subject,
-            _template: "table",
-            _replyto: data.email
-          })
-        });
+      const mailto =
+        "mailto:" + inbox +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
 
-        const result = await response.json();
+      window.location.href = mailto;
 
-        if (!response.ok || result.success === "false" || result.success === false) {
-          throw new Error(result.message || "Could not send the message.");
-        }
-
-        formWrap.style.display = "none";
-        done.classList.add("show");
-      } catch (error) {
-        showStatus("err", "Could not send right now. Please email " + inbox + " directly.");
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Send message →";
-      }
+      formWrap.style.display = "none";
+      done.classList.add("show");
     });
   </script>
 </body>
